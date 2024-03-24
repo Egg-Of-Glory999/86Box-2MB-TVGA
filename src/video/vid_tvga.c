@@ -535,13 +535,18 @@ static const device_config_t tvga_config[] = {
                 .value = 512
             },
             {
+                .description = "768 kB",
+                .value = 768
+            },
+            {
                 .description = "1 MB",
                 .value = 1024
             },
             /*Chip supports 2mb, but drivers are buggy*/
             {
-                .description = ""
-            }
+                .description = "2 MB",
+                .value = 2048
+            },
         }
     },
     {
