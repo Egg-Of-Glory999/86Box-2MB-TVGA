@@ -534,6 +534,7 @@ static const device_config_t tvga_config[] = {
                 .description = "512 kB",
                 .value = 512
             },
+            /*Chip supports 768kb, but whether or not it does work is unknown.*/
             {
                 .description = "768 kB",
                 .value = 768
