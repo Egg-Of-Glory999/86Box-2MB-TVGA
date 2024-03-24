@@ -534,18 +534,13 @@ static const device_config_t tvga_config[] = {
                 .description = "512 kB",
                 .value = 512
             },
-            /*Chip supports 768kb, but whether or not it does work is unknown.*/
-            {
-                .description = "768 kB",
-                .value = 768
-            },
             {
                 .description = "1 MB",
                 .value = 1024
             },
             /*Chip supports 2mb, but drivers are buggy*/
             {
-                .description = "2 MB",
+                .description = "2 MB (For TVGA8900D/D-R)",
                 .value = 2048
             },
         }
