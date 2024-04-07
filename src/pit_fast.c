@@ -99,7 +99,7 @@ pitf_ctr_get_count(void *data, int counter_id)
     return (uint16_t) ctr->l;
 }
 
-static void
+void
 pitf_ctr_set_out_func(void *data, int counter_id, void (*func)(int new_out, int old_out, void *priv))
 {
     if (data == NULL)
@@ -111,7 +111,7 @@ pitf_ctr_set_out_func(void *data, int counter_id, void (*func)(int new_out, int 
     ctr->out_func = func;
 }
 
-static void
+void
 pitf_ctr_set_using_timer(void *data, int counter_id, int using_timer)
 {
     if (tsc > 0)
@@ -133,7 +133,7 @@ pitf_read_timer(ctrf_t *ctr)
             read = 0;
         if (read > 0x10000)
             read = 0x10000;
-        if (ctr->m == 3)
+        if ((ctr->m == 3) && ctr->using_timer)
             read <<= 1;
         return read;
     }
@@ -191,6 +191,8 @@ pitf_ctr_load(ctrf_t *ctr, void *priv)
                 ctr->count = l;
                 if (ctr->using_timer)
                     timer_set_delay_u64(&ctr->timer, (uint64_t) (((l + 1) >> 1) * ctr->pit_const));
+                else
+                    ctr->newcount = (l & 1);
                 pitf_ctr_set_out(ctr, 1, pit);
                 ctr->thit = 0;
             }
@@ -269,6 +271,8 @@ pitf_set_gate_no_timer(ctrf_t *ctr, int gate, void *priv)
                 ctr->count = l;
                 if (ctr->using_timer)
                     timer_set_delay_u64(&ctr->timer, (uint64_t) (((l + 1) >> 1) * ctr->pit_const));
+                else
+                    ctr->newcount = (l & 1);
                 pitf_ctr_set_out(ctr, 1, pit);
                 ctr->thit = 0;
             }
@@ -284,7 +288,7 @@ pitf_set_gate_no_timer(ctrf_t *ctr, int gate, void *priv)
         pitf_dump_and_disable_timer(ctr);
 }
 
-static void
+void
 pitf_ctr_set_gate(void *data, int counter_id, int gate)
 {
     pitf_t *pit = (pitf_t *) data;
@@ -330,14 +334,23 @@ pitf_over(ctrf_t *ctr, void *priv)
         case 3: /*Square wave mode*/
             if (ctr->out) {
                 pitf_ctr_set_out(ctr, 0, pit);
-                ctr->count += (l >> 1);
-                if (ctr->using_timer)
+                if (ctr->using_timer) {
+                    ctr->count += (l >> 1);
                     timer_advance_u64(&ctr->timer, (uint64_t) ((l >> 1) * ctr->pit_const));
+                } else {
+                    ctr->count += l;
+                    ctr->newcount = (l & 1);
+                }
             } else {
                 pitf_ctr_set_out(ctr, 1, pit);
                 ctr->count += ((l + 1) >> 1);
-                if (ctr->using_timer)
+                if (ctr->using_timer) {
+                    ctr->count += (l >> 1);
                     timer_advance_u64(&ctr->timer, (uint64_t) (((l + 1) >> 1) * ctr->pit_const));
+                } else {
+                    ctr->count += l;
+                    ctr->newcount = (l & 1);
+                }
             }
 #if 0
             if (!t)
@@ -619,7 +632,7 @@ pitf_timer_over(void *priv)
     pitf_over(ctr, pit);
 }
 
-static void
+void
 pitf_ctr_clock(void *data, int counter_id)
 {
     pitf_t *pit = (pitf_t *) data;
@@ -631,7 +644,12 @@ pitf_ctr_clock(void *data, int counter_id)
     if (ctr->using_timer)
         return;
 
-    ctr->count -= (ctr->m == 3) ? 2 : 1;
+    if ((ctr->m == 3) && ctr->newcount) {
+        ctr->count -= ctr->out ? 1 : 3;
+        ctr->newcount = 0;
+    } else
+        ctr->count -= (ctr->m == 3) ? 2 : 1;
+
     if (!ctr->count)
         pitf_over(ctr, pit);
 }
@@ -690,6 +708,12 @@ pitf_close(void *priv)
 
     if (dev != NULL)
         free(dev);
+}
+
+void
+pitf_handler(int set, uint16_t base, int size, void *priv)
+{
+    io_handler(set, base, size, pitf_read, NULL, NULL, pitf_write, NULL, NULL, priv);
 }
 
 static void *

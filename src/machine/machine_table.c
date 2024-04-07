@@ -7299,7 +7299,7 @@ const machine_t machines[] = {
         .device = NULL,
         .fdc_device = NULL,
         .sio_device = NULL,
-        .vid_device = &gd5430_onboard_pci_device,
+        .vid_device = &gd5430_onboard_vlb_device,
         .snd_device = NULL,
         .net_device = NULL
     },
@@ -7339,7 +7339,7 @@ const machine_t machines[] = {
         .device = NULL,
         .fdc_device = NULL,
         .sio_device = NULL,
-        .vid_device = &gd5430_onboard_pci_device,
+        .vid_device = &gd5430_onboard_vlb_device,
         .snd_device = NULL,
         .net_device = NULL
     },
@@ -8705,7 +8705,7 @@ const machine_t machines[] = {
             .min_multi = MACHINE_MULTIPLIER_FIXED,
             .max_multi = MACHINE_MULTIPLIER_FIXED
         },
-        .bus_flags = MACHINE_PCI,
+        .bus_flags = MACHINE_BUS_PS2_LATCH | MACHINE_PCI,
         .flags = MACHINE_APM,
         .ram = {
             .min = 2048,
