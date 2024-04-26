@@ -29,7 +29,7 @@ jobs:
     name: "${{ matrix.ui.name }}, ${{ matrix.build.name }}, ${{ matrix.dynarec.name }}, ${{ matrix.target.name }}"
     if: 0
     
-    runs-on: self-hosted
+    runs-on: windows-2022
 
     env:
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
