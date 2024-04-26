@@ -1,4 +1,3 @@
-runs-on: self-hosted
 name: CMake (Windows, vcpkg/LLVM)
 
 on:
@@ -29,8 +28,8 @@ jobs:
   llvm-windows:
     name: "${{ matrix.ui.name }}, ${{ matrix.build.name }}, ${{ matrix.dynarec.name }}, ${{ matrix.target.name }}"
     if: 0
-
-    runs-on: windows-2022
+    
+    runs-on: self-hosted
 
     env:
       BUILD_WRAPPER_OUT_DIR: build_wrapper_output_directory # Directory where build-wrapper output will be placed
