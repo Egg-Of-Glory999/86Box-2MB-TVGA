@@ -1001,7 +1001,7 @@ scsi_cdrom_command_common(scsi_cdrom_t *dev)
                     case CDROM_TYPE_TOSHIBA_XM3301TA_0272:
                     case CDROM_TYPE_TOSHIBA_XM5701TA_3136:
                     case CDROM_TYPE_TOSHIBA_SDM1401_1008:
-                        bytes_per_second = 176.0 * 1024.0;
+                        bytes_per_second = 176400.0;
                         bytes_per_second *= (double) dev->drv->cur_speed;
                         break;
                 }
@@ -1393,7 +1393,7 @@ scsi_cdrom_read_blocks(scsi_cdrom_t *dev, int32_t *len, int first_batch, int ven
         type  = (dev->current_cdb[1] >> 2) & 7;
         flags = dev->current_cdb[9] | (((uint32_t) dev->current_cdb[10]) << 8);
     } else {
-        type  = 8;
+        type  = 8; /* Internal type code indicating both Mode 1 and Mode 2 Form 1 are allowed. */
         flags = 0x10;
     }
 
