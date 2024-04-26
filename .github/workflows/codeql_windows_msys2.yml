@@ -1,3 +1,4 @@
+runs-on: self-hosted
 name: CodeQL Analysis (Windows, msys2)
 
 on:
