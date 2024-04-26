@@ -1,4 +1,4 @@
-name: CMake (Windows, vcpkg/LLVM)
+name: CMake (Windows, vcpkg/LLVM) (Self-Hosted)
 
 on:
 
